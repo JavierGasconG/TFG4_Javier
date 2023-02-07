@@ -1,0 +1,5 @@
+rkoptev/ACS712 Current Sensor@^1.0.2
+Wire
+https://github.com/adafruit/Adafruit_LSM6DS
+stm32duino/STM32duino LSM6DS0@^2.0.0
+labfruits/Mcp320x@^1.4.2
