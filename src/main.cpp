@@ -175,5 +175,5 @@ void loop() {
   // Serial.print(","); Serial.print(gyro.gyro.z);
   // Serial.println();
   //  delayMicroseconds(10000);
-  //hola
+  //hol
 }
