@@ -6,12 +6,12 @@
 #include <Arduino.h>
 #include <Mcp320x.h>
 #include <LSM6DS0Sensor.h>
+float voltageConversionConstant = .004882814; 
 // For SPI mode, we need a CS pin
 #define SPI_CS    	5 		   // SPI slave select
 #define ADC_VREF    5080     // 5V Vref
 #define ADC_CLK     1600000  // SPI clock 1.6MHz
 MCP3208 adc(ADC_VREF, SPI_CS);
-
 bool primeraLecturaGiro= true;
 float grados=0.0;
 Adafruit_LSM6DSOX sox;
@@ -132,6 +132,8 @@ void loop() {
 
   //  /* Get a new normalized sensor event */
   float voltaje=0.0;
+  float viento = 0.0;
+
   int i =0;
   while (i<2)
   {
@@ -145,7 +147,12 @@ void loop() {
   
   voltaje=read_Adc(0);
   voltaje=voltaje/1000;
-  
+  viento= float(adc.toAnalog(adc.read(MCP3208::Channel::SINGLE_1)));
+  if(viento>520){
+    viento=viento/2000.0*32;
+  }else{
+    viento =0.0;
+  }
 
 
   lcd.setCursor(0, 1);
@@ -153,7 +160,11 @@ void loop() {
   lcd.print((double)voltaje,2);
   lcd.print("V");
   lcd.print("   ");
-
+  lcd.setCursor(0, 2);
+  lcd.print("viento: ");
+  lcd.print((double)viento,2);
+  lcd.print("mph");
+  lcd.print("   ");
   
  
 
