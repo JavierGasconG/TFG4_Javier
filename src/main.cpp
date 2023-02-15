@@ -6,11 +6,14 @@
 #include <Arduino.h>
 #include <Mcp320x.h>
 #include <LSM6DS0Sensor.h>
-float voltageConversionConstant = .004882814; 
+
 // For SPI mode, we need a CS pin
 #define SPI_CS    	5 		   // SPI slave select
 #define ADC_VREF    5080     // 5V Vref
 #define ADC_CLK     1600000  // SPI clock 1.6MHz
+#define RESOLUTION_ADC 4096
+#define O_APER 2530 //mV
+#define SENSIVILIDAD_AMPER 1
 MCP3208 adc(ADC_VREF, SPI_CS);
 bool primeraLecturaGiro= true;
 float grados=0.0;
@@ -118,7 +121,14 @@ float read_Adc (int chanel){
 
   return val;
 }
-
+float read_Amper (int chanel){
+  float voltaje, amperaje =0.0;
+  voltaje = read_Adc(chanel);
+  amperaje= voltaje-O_APER/SENSIVILIDAD_AMPER;
+  Serial.println(voltaje);
+  Serial.println(amperaje);
+  return amperaje;
+}
 void setup(void) {
   Serial.begin(9600);
   while (!Serial)
@@ -132,6 +142,7 @@ void loop() {
 
   //  /* Get a new normalized sensor event */
   float voltaje=0.0;
+  float amperaje=0.0;
   float viento = 0.0;
 
   int i =0;
@@ -147,6 +158,8 @@ void loop() {
   
   voltaje=read_Adc(0);
   voltaje=voltaje/1000;
+  amperaje=read_Amper(2);
+
   viento= float(adc.toAnalog(adc.read(MCP3208::Channel::SINGLE_1)));
   if(viento>520){
     viento=viento/2000.0*32;
@@ -166,7 +179,11 @@ void loop() {
   lcd.print("mph");
   lcd.print("   ");
   
- 
+  lcd.setCursor(0, 3);
+  lcd.print("Amper: ");
+  lcd.print((double)amperaje,2);
+  lcd.print("mA");
+  lcd.print("   ");
 
 
 
