@@ -6,6 +6,8 @@
 #include <Arduino.h>
 #include <Mcp320x.h>
 #include <LSM6DS0Sensor.h>
+#include <BH1750.h>
+#include <Wire.h>
 
 // For SPI mode, we need a CS pin
 #define SPI_CS    	5 		   // SPI slave select
@@ -17,8 +19,31 @@
 MCP3208 adc(ADC_VREF, SPI_CS);
 bool primeraLecturaGiro= true;
 float grados=0.0;
+float lum = 0.0;
 Adafruit_LSM6DSOX sox;
+BH1750 lightMeter(0x23);
+
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+void ini_Lum(void){
+  Wire.begin();
+  if (lightMeter.begin(BH1750::CONTINUOUS_HIGH_RES_MODE)) {
+    Serial.println(F("BH1750 Advanced begin"));
+  } else {
+    Serial.println(F("Error initialising BH1750"));
+  }
+
+}
+float read_lum(void){
+  float lux =0.0;
+  if (lightMeter.measurementReady()) {
+    float lux = lightMeter.readLightLevel();
+    Serial.print("Light: ");
+    Serial.print(lux);
+    Serial.println(" lx");
+    return lux;
+  }
+  return lux;
+}
 void ini_Adc(void){
 // configure PIN mode
   pinMode(SPI_CS, OUTPUT);
@@ -136,6 +161,7 @@ void setup(void) {
   ini_Adc();
   ini_Giro();
   ini_lcd();
+  ini_Lum();
 }
 
 void loop() {
@@ -146,6 +172,7 @@ void loop() {
   float viento = 0.0;
 
   int i =0;
+
   while (i<2)
   {
     read_Giro();
@@ -155,7 +182,9 @@ void loop() {
     lcd.print((double)grados,2);
     lcd.print("   ");
   }
+
   
+  lum = read_lum();
   voltaje=read_Adc(0);
   voltaje=voltaje/1000;
   amperaje=read_Amper(2);
@@ -166,7 +195,6 @@ void loop() {
   }else{
     viento =0.0;
   }
-
 
   lcd.setCursor(0, 1);
   lcd.print("Voltaje: ");
@@ -180,10 +208,9 @@ void loop() {
   lcd.print("   ");
   
   lcd.setCursor(0, 3);
-  lcd.print("Amper: ");
-  lcd.print((double)amperaje,2);
-  lcd.print("mA");
-  lcd.print("   ");
+  lcd.print("Luminosidad: ");
+  lcd.print((float)lum,2);
+  lcd.print("  ");
 
 
 
