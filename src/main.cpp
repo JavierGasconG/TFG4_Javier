@@ -8,7 +8,11 @@
 #include <LSM6DS0Sensor.h>
 #include <BH1750.h>
 #include <Wire.h>
+#include "FS.h"
+#include "SD.h"
+#include <WiFi.h>
 
+#include "SPI.h"
 // For SPI mode, we need a CS pin
 #define SPI_CS    	5 		   // SPI slave select
 #define ADC_VREF    5080     // 5V Vref
@@ -16,13 +20,36 @@
 #define RESOLUTION_ADC 4096
 #define O_APER 2530 //mV
 #define SENSIVILIDAD_AMPER 1
+const char* ssid       = "YOUR_SSID";
+const char* password   = "YOUR_PASS";
+
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 3600;
+const int   daylightOffset_sec = 3600;
 MCP3208 adc(ADC_VREF, SPI_CS);
 bool primeraLecturaGiro= true;
 float grados=0.0;
 float lum = 0.0;
 Adafruit_LSM6DSOX sox;
 BH1750 lightMeter(0x23);
+void beginLocalTime()
+{
+  Serial.printf("Connecting to %s ", ssid);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+  }
+  Serial.println(" CONNECTED");
+  
+  //init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+  printLocalTime();
 
+  //disconnect WiFi as it's no longer needed
+  WiFi.disconnect(true);
+  WiFi.mode(WIFI_OFF);
+}
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 void ini_Lum(void){
   Wire.begin();
@@ -32,6 +59,63 @@ void ini_Lum(void){
     Serial.println(F("Error initialising BH1750"));
   }
 
+}
+
+
+
+void readFile(fs::FS &fs, const char * path){
+  Serial.printf("Reading file: %s\n", path);
+
+  File file = fs.open(path);
+  if(!file){
+    Serial.println("Failed to open file for reading");
+    return;
+  }
+
+  Serial.print("Read from file: ");
+  while(file.available()){
+    Serial.write(file.read());
+  }
+  file.close();
+}
+
+void writeFile(fs::FS &fs, const char * path, const char * message){
+  Serial.printf("Writing file: %s\n", path);
+
+  File file = fs.open(path, FILE_WRITE);
+  if(!file){
+    Serial.println("Failed to open file for writing");
+    return;
+  }
+  if(file.print(message)){
+    Serial.println("File written");
+  } else {
+    Serial.println("Write failed");
+  }
+  file.close();
+}
+void iniSD(void){
+  if(!SD.begin(4)){
+    Serial.println("Card Mount Failed");
+    return;
+  }
+  uint8_t cardType = SD.cardType();
+
+  if(cardType == CARD_NONE){
+    Serial.println("No SD card attached");
+    return;
+  }
+
+  Serial.print("SD Card Type: ");
+  if(cardType == CARD_MMC){
+    Serial.println("MMC");
+  } else if(cardType == CARD_SD){
+    Serial.println("SDSC");
+  } else if(cardType == CARD_SDHC){
+    Serial.println("SDHC");
+  } else {
+    Serial.println("UNKNOWN");
+  }
 }
 float read_lum(void){
   float lux =0.0;
@@ -162,6 +246,7 @@ void setup(void) {
   ini_Giro();
   ini_lcd();
   ini_Lum();
+  iniSD();
 }
 
 void loop() {
@@ -211,6 +296,10 @@ void loop() {
   lcd.print("Luminosidad: ");
   lcd.print((float)lum,2);
   lcd.print("  ");
+
+
+
+  writeFile(SD, "/data.txt", "Hello ");
 
 
 
