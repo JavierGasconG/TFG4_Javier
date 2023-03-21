@@ -11,7 +11,7 @@
 #include "FS.h"
 #include "SD.h"
 #include <WiFi.h>
-
+#include "time.h"
 #include "SPI.h"
 // For SPI mode, we need a CS pin
 #define SPI_CS    	5 		   // SPI slave select
@@ -30,8 +30,26 @@ MCP3208 adc(ADC_VREF, SPI_CS);
 bool primeraLecturaGiro= true;
 float grados=0.0;
 float lum = 0.0;
+int zero = 2048;
 Adafruit_LSM6DSOX sox;
 BH1750 lightMeter(0x23);
+void printLocalTime()
+{
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+}
+String getTime(){
+  struct tm timeinfo;
+  if(!getLocalTime(&timeinfo)){
+    Serial.println("Failed to obtain time");
+    return;
+  }
+  return (&timeinfo, "%A, %B %d %Y %H:%M:%S");
+}
 void beginLocalTime()
 {
   Serial.printf("Connecting to %s ", ssid);
@@ -61,20 +79,49 @@ void ini_Lum(void){
 
 }
 
+float read_Amper(uint16_t frequency, int pin) {
+	uint32_t period = 1000000 / frequency;
+	uint32_t t_start = micros();
 
+	uint32_t Isum = 0, measurements_count = 0;
+	int32_t Inow;
 
-void readFile(fs::FS &fs, const char * path){
+	while (micros() - t_start < period) {
+		Inow = float(adc.toAnalog(adc.read(MCP3208::Channel::SINGLE_3))) - zero;
+		Isum += Inow*Inow;
+		measurements_count++;
+	}
+
+	float Irms = sqrt(Isum / measurements_count) / 4096 * 5.0 / 0.066;
+	return Irms;
+}
+void appendFile(fs::FS &fs, const char * path, const char * message){
+    Serial.printf("Appending to file: %s\n", path);
+
+    File file = fs.open(path, FILE_APPEND);
+    if(!file){
+        Serial.println("Failed to open file for appending");
+        return;
+    }
+    if(file.print(message)){
+        Serial.println("Message appended");
+    } else {
+        Serial.println("Append failed");
+    }
+    file.close();
+}
+String readFile(fs::FS &fs, const char * path){
   Serial.printf("Reading file: %s\n", path);
 
   File file = fs.open(path);
   if(!file){
     Serial.println("Failed to open file for reading");
-    return;
+    return "0";
   }
 
   Serial.print("Read from file: ");
   while(file.available()){
-    Serial.write(file.read());
+    return String(file.read());
   }
   file.close();
 }
@@ -152,6 +199,7 @@ void ini_Giro(void){
       delay(10);
     }
   }
+  grados=readFile(SD,"/giro.txt").toInt();
 }
 void ini_lcd(void){
   lcd.begin();                      // initialize the lcd 
@@ -256,6 +304,7 @@ void loop() {
   float amperaje=0.0;
   float viento = 0.0;
 
+
   int i =0;
 
   while (i<2)
@@ -277,6 +326,7 @@ void loop() {
   viento= float(adc.toAnalog(adc.read(MCP3208::Channel::SINGLE_1)));
   if(viento>520){
     viento=viento/2000.0*32;
+    viento= viento*1.61;
   }else{
     viento =0.0;
   }
@@ -289,7 +339,7 @@ void loop() {
   lcd.setCursor(0, 2);
   lcd.print("viento: ");
   lcd.print((double)viento,2);
-  lcd.print("mph");
+  lcd.print("kmh");
   lcd.print("   ");
   
   lcd.setCursor(0, 3);
@@ -298,9 +348,11 @@ void loop() {
   lcd.print("  ");
 
 
-
-  writeFile(SD, "/data.txt", "Hello ");
-
+  String hora=getTime();
+  String data_SD=hora+", Voltaje, "+String(voltaje)+", Amperaje, "+String(amperaje)+", viento, "+String(viento)+", Grados, "+String(grados);
+  String giroAux= String(grados);
+  appendFile(SD, "/data.txt",data_SD.c_str());
+  writeFile(SD, "/giro.txt", giroAux.c_str());
 
 
 
