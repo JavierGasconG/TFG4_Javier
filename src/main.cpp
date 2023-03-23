@@ -13,15 +13,18 @@
 #include <WiFi.h>
 #include "time.h"
 #include "SPI.h"
-// For SPI mode, we need a CS pin
+#include <NTPClient.h>
+#include <WiFi.h>
+
+#include <WiFiUdp.h>
 #define SPI_CS    	5 		   // SPI slave select
 #define ADC_VREF    5080     // 5V Vref
 #define ADC_CLK     1600000  // SPI clock 1.6MHz
 #define RESOLUTION_ADC 4096
 #define O_APER 2530 //mV
 #define SENSIVILIDAD_AMPER 1
-const char* ssid       = "YOUR_SSID";
-const char* password   = "YOUR_PASS";
+const char* ssid       = "Esp32";
+const char* password   = "prueba123";
 
 const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 3600;
@@ -33,41 +36,9 @@ float lum = 0.0;
 int zero = 2048;
 Adafruit_LSM6DSOX sox;
 BH1750 lightMeter(0x23);
-void printLocalTime()
-{
-  struct tm timeinfo;
-  if(!getLocalTime(&timeinfo)){
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
-}
-String getTime(){
-  struct tm timeinfo;
-  if(!getLocalTime(&timeinfo)){
-    Serial.println("Failed to obtain time");
-    return;
-  }
-  return (&timeinfo, "%A, %B %d %Y %H:%M:%S");
-}
-void beginLocalTime()
-{
-  Serial.printf("Connecting to %s ", ssid);
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
-  }
-  Serial.println(" CONNECTED");
-  
-  //init and get the time
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  printLocalTime();
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
 
-  //disconnect WiFi as it's no longer needed
-  WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
-}
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 void ini_Lum(void){
   Wire.begin();
@@ -78,7 +49,15 @@ void ini_Lum(void){
   }
 
 }
+void begin_WiFi(){
+  WiFi.begin(ssid, password);
 
+  while ( WiFi.status() != WL_CONNECTED ) {
+    delay ( 500 );
+    Serial.println ( "wifi" );
+  }
+
+}
 float read_Amper(uint16_t frequency, int pin) {
 	uint32_t period = 1000000 / frequency;
 	uint32_t t_start = micros();
@@ -187,7 +166,6 @@ void ini_Adc(void){
 
   // initialize SPI interface for MCP3208
   SPISettings settings(ADC_CLK, MSBFIRST, SPI_MODE0);
-  SPI.begin();
   SPI.beginTransaction(settings);
 }
 void ini_Giro(void){
@@ -289,7 +267,7 @@ float read_Amper (int chanel){
 void setup(void) {
   Serial.begin(9600);
   while (!Serial)
-    delay(10); // will pause Zero, Leonardo, etc until serial console opens
+    delay(10); 
   ini_Adc();
   ini_Giro();
   ini_lcd();
@@ -317,7 +295,9 @@ void loop() {
     lcd.print("   ");
   }
 
-  
+  timeClient.begin();
+  Serial.println("checkpoint3");
+
   lum = read_lum();
   voltaje=read_Adc(0);
   voltaje=voltaje/1000;
@@ -329,7 +309,7 @@ void loop() {
     viento= viento*1.61;
   }else{
     viento =0.0;
-  }
+}
 
   lcd.setCursor(0, 1);
   lcd.print("Voltaje: ");
@@ -341,18 +321,19 @@ void loop() {
   lcd.print((double)viento,2);
   lcd.print("kmh");
   lcd.print("   ");
-  
+
   lcd.setCursor(0, 3);
   lcd.print("Luminosidad: ");
   lcd.print((float)lum,2);
   lcd.print("  ");
 
 
-  String hora=getTime();
-  String data_SD=hora+", Voltaje, "+String(voltaje)+", Amperaje, "+String(amperaje)+", viento, "+String(viento)+", Grados, "+String(grados);
   String giroAux= String(grados);
-  appendFile(SD, "/data.txt",data_SD.c_str());
+
   writeFile(SD, "/giro.txt", giroAux.c_str());
+
+  appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+"/n"", Voltaje, "+String(voltaje)+", Amperaje, "+String(amperaje)+", viento, "+String(viento)+", Grados, "+String(grados)).c_str());
+  Serial.println(timeClient.getDay()+timeClient.getFormattedTime());
 
 
 
