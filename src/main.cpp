@@ -15,7 +15,8 @@
 #include "SPI.h"
 #include <NTPClient.h>
 #include <WiFi.h>
-
+#include <HTTPClient.h>
+#include <ESP32httpUpdate.h>
 #include <WiFiUdp.h>
 #define SPI_CS    	5 		   // SPI slave select
 #define ADC_VREF    5080     // 5V Vref
@@ -34,6 +35,9 @@ bool primeraLecturaGiro= true;
 float grados=0.0;
 float lum = 0.0;
 int zero = 2048;
+int julio_total=41472;
+int julio_actual=41472;
+
 Adafruit_LSM6DSOX sox;
 BH1750 lightMeter(0x23);
 WiFiUDP ntpUDP;
@@ -48,6 +52,11 @@ void ini_Lum(void){
     Serial.println(F("Error initialising BH1750"));
   }
 
+}
+float bat(float amperaje){
+julio_actual =julio_actual-amperaje*4.8;
+float porcentaje = julio_actual*100/julio_total;
+return porcentaje;
 }
 void begin_WiFi(){
   WiFi.begin(ssid, password);
@@ -258,11 +267,16 @@ float read_Adc (int chanel){
 }
 float read_Amper (int chanel){
   float voltaje, amperaje =0.0;
-  voltaje = read_Adc(chanel);
-  amperaje= voltaje-O_APER/SENSIVILIDAD_AMPER;
-  Serial.println(voltaje);
-  Serial.println(amperaje);
+  for(int i=0; i<10;i++){
+      voltaje = read_Adc(chanel)*(5.0 / 4096.0);
+      amperaje=amperaje+ (voltaje-2.527)/0.066;
+  }
+  amperaje=amperaje/10;
+
   return amperaje;
+
+
+  
 }
 void setup(void) {
   Serial.begin(9600);
