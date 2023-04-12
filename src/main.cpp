@@ -60,7 +60,7 @@ return porcentaje;
 }
 void begin_WiFi(){
   WiFi.begin(ssid, password);
-  delay(20000);
+
   while ( WiFi.status() != WL_CONNECTED ) {
     delay ( 500 );
     Serial.println ( "wifi" );
@@ -82,7 +82,7 @@ void check_version(){
         Serial.println(payload);
         if(version != payload){
           t_httpUpdate_return ret = ESPhttpUpdate.update("http://192.168.1.205/firmware.bin");       
-
+        }
       }
   }
 }
@@ -302,11 +302,90 @@ void setup(void) {
   Serial.begin(9600);
   while (!Serial)
     delay(10); 
-
+  ini_Adc();
+  ini_Giro();
+  ini_lcd();
+  ini_Lum();
+  iniSD();
   begin_WiFi();
 }
 
 void loop() {
   check_version();
+  //  /* Get a new normalized sensor event */
+  float voltaje=0.0;
+  float amperaje=0.0;
+  float viento = 0.0;
+
+
+  int i =0;
+
+  while (i<2)
+  {
+    read_Giro();
+    i++;
+    lcd.setCursor(0, 0);
+    lcd.print("Grados: ");
+    lcd.print((double)grados,2);
+    lcd.print("   ");
+  }
+
+  timeClient.begin();
+  Serial.println("checkpoint3");
   
+  lum = read_lum();
+  voltaje=read_Adc(0);
+  voltaje=voltaje/1000;
+  amperaje=read_Amper(2);
+
+  viento= float(adc.toAnalog(adc.read(MCP3208::Channel::SINGLE_1)));
+  if(viento>520){
+    viento=viento/2000.0*32;
+    viento= viento*1.61;
+  }else{
+    viento =0.0;
+}
+
+  lcd.setCursor(0, 1);
+  lcd.print("Voltaje: ");
+  lcd.print((double)voltaje,2);
+  lcd.print("V");
+  lcd.print("   ");
+  lcd.setCursor(0, 2);
+  lcd.print("viento: ");
+  lcd.print((double)viento,2);
+  lcd.print("kmh");
+  lcd.print("   ");
+
+  lcd.setCursor(0, 3);
+  lcd.print("Luminosidad: ");
+  lcd.print((float)lum,2);
+  lcd.print("  ");
+
+
+  String giroAux= String(grados);
+
+  writeFile(SD, "/giro.txt", giroAux.c_str());
+
+  appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+"/n"", Voltaje, "+String(voltaje)+", Amperaje, "+String(amperaje)+", viento, "+String(viento)+", Grados, "+String(grados)).c_str());
+  Serial.println(timeClient.getDay()+timeClient.getFormattedTime());
+
+
+
+  //  // serial plotter friendly format
+
+  //  Serial.print(temp.temperature);
+  //  Serial.print(",");
+
+  //  Serial.print(accel.acceleration.x);
+  //  Serial.print(","); Serial.print(accel.acceleration.y);
+  //  Serial.print(","); Serial.print(accel.acceleration.z);
+  //  Serial.print(",");
+
+  // Serial.print(gyro.gyro.x);
+  // Serial.print(","); Serial.print(gyro.gyro.y);
+  // Serial.print(","); Serial.print(gyro.gyro.z);
+  // Serial.println();
+  //  delayMicroseconds(10000);
+  //hol
 }
