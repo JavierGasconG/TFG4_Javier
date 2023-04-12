@@ -1,0 +1,78 @@
+#include <Adafruit_LSM6DSOX.h>
+#include <LiquidCrystal_I2C.h>
+#include <Arduino.h>
+#include <Mcp320x.h>
+#include <LSM6DS0Sensor.h>
+#include <BH1750.h>
+#include <Wire.h>
+#include "FS.h"
+#include "SD.h"
+#include <WiFi.h>
+#include "time.h"
+#include "SPI.h"
+#include <NTPClient.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ESP32httpUpdate.h>
+#include <WiFiUdp.h>
+const char* ssid       = "Esp32";
+const char* password   = "prueba123";
+const char* version_ser   = "http://192.168.56.12/version";
+const char* code   = "http://192.168.56.12/code.bin";
+
+String version = "0.1";
+void setup() {
+
+    Serial.begin(9600);
+    // Serial.setDebugOutput(true);
+
+    Serial.println();
+    Serial.println();
+    Serial.println();
+
+    for(uint8_t t = 4; t > 0; t--) {
+        Serial.printf("[SETUP] WAIT %d...\n", t);
+        Serial.flush();
+        delay(1000);
+    }
+
+    WiFi.begin(ssid, password);
+
+}
+
+void loop() {
+    // wait for WiFi connection
+    if((WiFi.status() == WL_CONNECTED)) {
+        HTTPClient http;
+        WiFiClient client;
+        if (http.begin(client, version)) //Iniciar conexión
+        {
+            Serial.print("[HTTP] GET...\n");
+            int httpCode = http.GET();
+            if (httpCode > 0) {
+                Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+                if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+                    String payload = http.getString();   // Obtener respuesta
+                    if (payload!=version){
+                        t_httpUpdate_return ret = ESPhttpUpdate.update(version_ser);
+
+                        switch(ret) {
+                            case HTTP_UPDATE_FAILED:
+                                Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s", ESPhttpUpdate.getLastError(), ESPhttpUpdate.getLastErrorString().c_str());
+                                break;
+
+                            case HTTP_UPDATE_NO_UPDATES:
+                                Serial.println("HTTP_UPDATE_NO_UPDATES");
+                                break;
+
+                            case HTTP_UPDATE_OK:
+                                Serial.println("HTTP_UPDATE_OK");
+                                break;
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+}
