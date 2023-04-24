@@ -22,7 +22,7 @@
 #define ADC_VREF    5080     // 5V Vref
 #define ADC_CLK     1600000  // SPI clock 1.6MHz
 #define RESOLUTION_ADC 4096
-#define O_APER 2530 //mV
+#define O_APER 2540 //mV
 #define SENSIVILIDAD_AMPER 1
 const char* ssid       = "SBC";
 const char* password   = "SBCwifi$";
@@ -31,7 +31,6 @@ const char* ntpServer = "pool.ntp.org";
 const long  gmtOffset_sec = 3600;
 const int   daylightOffset_sec = 3600;
 MCP3208 adc(ADC_VREF, SPI_CS);
-bool primeraLecturaGiro= true;
 float grados=0.0;
 float lum = 0.0;
 int zero = 2048;
@@ -52,6 +51,15 @@ void ini_Lum(void){
     Serial.println(F("Error initialising BH1750"));
   }
 
+}
+def read_viento (int chanel){
+  viento= float(read_Adc(chanel));
+  if(viento>520){
+    viento=viento/2000.0*32;
+    viento= viento*1.61;
+  }else{
+    viento =0.0;
+  }
 }
 float bat(float amperaje){
 julio_actual =julio_actual-amperaje*4.8;
@@ -223,12 +231,8 @@ void read_Giro( void){
     sox.getEvent(&accel, &gyro, &temp);
     gradosRecogidos = (gyro.gyro.z + 0.02) * 57.2958;
     if(gradosRecogidos > 0.30 || gradosRecogidos < 0.1 ){
-      grados= grados - (((gyro.gyro.z + 0.02) * 57.2958)/10);
-      if (primeraLecturaGiro)
-      {
-        grados=0.0;
-        primeraLecturaGiro = false;
-      }
+      grados= (grados - (((gyro.gyro.z + 0.02) * 57.2958)/10))%360;
+
       
     }
     
@@ -289,7 +293,7 @@ float read_Amper (int chanel){
   float voltaje, amperaje =0.0;
   for(int i=0; i<10;i++){
       voltaje = read_Adc(chanel)*(5.0 / 4096.0);
-      amperaje=amperaje+ (voltaje-2.527)/0.066;
+      amperaje=amperaje+ (voltaje-2.540)/0.066;
   }
   amperaje=amperaje/10;
 
@@ -312,7 +316,7 @@ void setup(void) {
 
 void loop() {
   check_version();
-  //  /* Get a new normalized sensor event */
+
   float voltaje=0.0;
   float amperaje=0.0;
   float viento = 0.0;
@@ -331,20 +335,14 @@ void loop() {
   }
 
   timeClient.begin();
-  Serial.println("checkpoint3");
+
   
   lum = read_lum();
   voltaje=read_Adc(0);
   voltaje=voltaje/1000;
   amperaje=read_Amper(2);
 
-  viento= float(adc.toAnalog(adc.read(MCP3208::Channel::SINGLE_1)));
-  if(viento>520){
-    viento=viento/2000.0*32;
-    viento= viento*1.61;
-  }else{
-    viento =0.0;
-}
+  viento=read_viento(1);
 
   lcd.setCursor(0, 1);
   lcd.print("Voltaje: ");
