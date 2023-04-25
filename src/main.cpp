@@ -1,16 +1,9 @@
-// Basic demo for accelerometer & gyro readings from Adafruit
-// LSM6DSOX sensor
-
 #include "LCD.h"
 #include <Arduino.h>
-
-
 #include "Lum.h"
-
 #include <WiFi.h>
 #include <micro_SD.h>
 #include "time.h"
-
 #include <NTPClient.h>
 #include <WiFi.h>
 #include <WiFiUdp.h>
@@ -53,8 +46,6 @@ void begin_WiFi(){
   }
 
 }
-
-
 float read_Amper(uint16_t frequency, int pin) {
 	uint32_t period = 1000000 / frequency;
 	uint32_t t_start = micros();
@@ -101,7 +92,6 @@ void setup(void) {
 
 void loop() {
   check_version();
-  //  /* Get a new normalized sensor event */
   float voltaje=0.0;
   float amperaje=0.0;
   float viento = 0.0;
@@ -129,13 +119,6 @@ void loop() {
   write_lcd((double)viento,"Viento: ","kmh", 2,2 );
   write_lcd((double)lum,"Luminosidad: ","", 3,2 );
 
-
-
-
-
-
-
-
   String giroAux= String(grados);
 
   writeFile(SD, "/giro.txt", giroAux.c_str());
@@ -145,20 +128,4 @@ void loop() {
 
 
 
-  //  // serial plotter friendly format
-
-  //  Serial.print(temp.temperature);
-  //  Serial.print(",");
-
-  //  Serial.print(accel.acceleration.x);
-  //  Serial.print(","); Serial.print(accel.acceleration.y);
-  //  Serial.print(","); Serial.print(accel.acceleration.z);
-  //  Serial.print(",");
-
-  // Serial.print(gyro.gyro.x);
-  // Serial.print(","); Serial.print(gyro.gyro.y);
-  // Serial.print(","); Serial.print(gyro.gyro.z);
-  // Serial.println();
-  //  delayMicroseconds(10000);
-  //hol
 }

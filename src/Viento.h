@@ -1,0 +1,1 @@
+float read_viento(int channel);
