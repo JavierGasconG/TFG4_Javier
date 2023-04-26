@@ -4,8 +4,9 @@
 
 #define SPI_CS    	5 		   // SPI slave select
 #define ADC_VREF    5080     // 5V Vref
-#define ADC_CLK     1600000  // SPI clock 1.6MHz
+
 MCP3208 adc(ADC_VREF, SPI_CS);
+
 void ini_Adc(void){
 
 // configure PIN mode
@@ -18,12 +19,11 @@ void ini_Adc(void){
   
 
   // initialize SPI interface for MCP3208
-  SPISettings settings(ADC_CLK, MSBFIRST, SPI_MODE0);
-  SPI.beginTransaction(settings);
 }
-float read_Adc (int chanel){
+float read_Adc (int chanel, SPISettings settings){
   uint32_t t1;
   uint32_t t2;
+  SPI.beginTransaction(settings);
 
   // start sampling
   uint16_t raw = 0; 
@@ -66,6 +66,6 @@ float read_Adc (int chanel){
 
   // get analog value
   uint16_t val = adc.toAnalog(raw);
-
+  SPI.endTransaction();
   return val;
 }
