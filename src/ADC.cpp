@@ -20,7 +20,7 @@ void ini_Adc(void){
 
   // initialize SPI interface for MCP3208
 }
-float read_Adc (int chanel, SPISettings settings){
+float read_Adc (int channel, SPISettings settings){
   uint32_t t1;
   uint32_t t2;
   SPI.beginTransaction(settings);
@@ -28,7 +28,7 @@ float read_Adc (int chanel, SPISettings settings){
   // start sampling
   uint16_t raw = 0; 
   t1 = micros();
-  switch (chanel)
+  switch (channel)
   {
   case 0:
     raw = adc.read(MCP3208::Channel::SINGLE_0);

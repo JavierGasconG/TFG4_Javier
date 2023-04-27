@@ -1,3 +1,3 @@
 #include <SPI.h>
-float ISNS20_get_mA(bool is_offset, SPISettings settings);
-void ini_amper(SPISettings settings);
+double ISNS20_get_mA(SPISettings settings);
+void ini_amper();

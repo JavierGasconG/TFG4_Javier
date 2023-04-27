@@ -1,3 +1,4 @@
+
 #include "LCD.h"
 #include <Arduino.h>
 #include "Lum.h"
@@ -12,11 +13,8 @@
 #include "Giro.h"
 #include "Viento.h"
 #include "Amper.h"
-#include "Volt.h"
 #define RESOLUTION_ADC 4096
 #define O_APER 2530 //mV
-double voltaje=0.0;
-
 #define SENSIVILIDAD_AMPER 1
 SPISettings settings(1000000, MSBFIRST, SPI_MODE0);
 
@@ -61,8 +59,8 @@ void setup(void) {
     delay(10); 
   SPI.begin();
   digitalWrite(4, HIGH);     //end transfer
-  //ini_amper();
-  ini_Adc();
+  ini_amper();
+  //ini_Adc();
   //grados =ini_Giro();
   //ini_lcd();
   //ini_Lum();
@@ -73,9 +71,10 @@ void setup(void) {
 
 void loop() {
   //check_version();
-  //double amper=0.0;
+  //float voltaje=0.0;
+  double amper=0.0;
   //float amperaje=0.0;
-  float viento = 0.0;
+  //float viento = 0.0;
   //float lum = 0.0;
 
   //int i =0;
@@ -89,17 +88,15 @@ void loop() {
   //}
 
 
-  viento = read_viento(1, settings );
+  //viento = read_viento(1);
   
   //lum = read_lum();
-  //voltaje=read_volt(0, settings);
-
-  Serial.print(viento);
-  Serial.println(" kmh");
-  //pinMode(4, OUTPUT);
-  //amper=ISNS20_get_mA(settings);
-  //Serial.print(amper);
-  //Serial.println(" A");
+ // voltaje=read_Adc(0);
+  //voltaje=voltaje/1000;
+  pinMode(4, OUTPUT);
+  amper=ISNS20_get_mA(settings);
+  Serial.print(amper);
+  Serial.println(" A");
   delay(500);
   //amperaje=read_Amper(2);
 

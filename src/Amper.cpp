@@ -31,12 +31,12 @@
 #define FILTER true //enable/disable digital filter
 #define AVG_NUM 100 //number of readings to average (if filter is on)
 
-float offset = -1.49; //variable to save measurement offset
+double offset = -1.499; //variable to save measurement offset
 
-float ISNS20_get_mA(bool is_offset, SPISettings settings) {
+double ISNS20_get_mA( SPISettings settings) {
   SPI.beginTransaction(settings);
 
-  float sum = 0;
+  double sum = 0;
   for (int i = 0; i < AVG_NUM; i++) {
     int temporal = 0;
     digitalWrite(CS, LOW);      //begin SPI transfer
@@ -48,13 +48,12 @@ float ISNS20_get_mA(bool is_offset, SPISettings settings) {
     delay(1);
     digitalWrite(CS, HIGH);     //end transfer
     delay(1);
-    float result = temporal / 4096.0 * (-3.0);  //convert raw value to mA: bit result / 12 bits * 3.0V reference
+    double result = temporal / 4096.0 * (-3.0);  //convert raw value to mA: bit result / 12 bits * 3.0V reference
 
-    //if the measurement isn't for offset, correct the error
-    if (!is_offset) {
-      result = (result - offset) / 0.066; //correct offset: (result-offset)/(0.066V per Amp ratio)
-    }
 
+  
+    result = (result - offset) / 0.066; //correct offset: (result-offset)/(0.066V per Amp ratio)
+    
     //if no filtering is needed, return the result
     if (!FILTER) {
       return result;
@@ -66,19 +65,14 @@ float ISNS20_get_mA(bool is_offset, SPISettings settings) {
   SPI.endTransaction();
   return sum;
 }
-void ini_amper(SPISettings settings) {
+void ini_amper() {
 
-  //pinMode(RELAY, OUTPUT);   //initialize pin connected to relay
-  //digitalWrite(RELAY, LOW); //turn the relay off (load not connected)
 
- 
   
   pinMode(CS, OUTPUT);  //set chip select pin as output
 
 
-  offset = ISNS20_get_mA(true, settings);  //measure and save the offset
 
-  //digitalWrite(RELAY, HIGH);   //turn relay on
 }
 
 

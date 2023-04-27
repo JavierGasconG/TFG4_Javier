@@ -75,7 +75,7 @@ void loop() {
   //check_version();
   //double amper=0.0;
   //float amperaje=0.0;
-  float viento = 0.0;
+  //float viento = 0.0;
   //float lum = 0.0;
 
   //int i =0;
@@ -89,13 +89,13 @@ void loop() {
   //}
 
 
-  viento = read_viento(1, settings );
+  //viento = read_viento(1);
   
   //lum = read_lum();
-  //voltaje=read_volt(0, settings);
+  voltaje=read_volt(0, settings);
 
-  Serial.print(viento);
-  Serial.println(" kmh");
+  Serial.print(voltaje);
+  Serial.println(" V");
   //pinMode(4, OUTPUT);
   //amper=ISNS20_get_mA(settings);
   //Serial.print(amper);
