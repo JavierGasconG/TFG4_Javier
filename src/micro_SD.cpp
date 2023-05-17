@@ -2,11 +2,13 @@
 #include <SD.h>
 
 void appendFile(fs::FS &fs, const char * path, const char * message){
+    digitalWrite(4, HIGH);
     Serial.printf("Appending to file: %s\n", path);
 
     File file = fs.open(path, FILE_APPEND);
     if(!file){
         Serial.println("Failed to open file for appending");
+        digitalWrite(4, LOW);
         return;
     }
     if(file.print(message)){
@@ -15,24 +17,33 @@ void appendFile(fs::FS &fs, const char * path, const char * message){
         Serial.println("Append failed");
     }
     file.close();
+    digitalWrite(4, LOW);
 }
 String readFile(fs::FS &fs, const char * path){
+  digitalWrite(4, HIGH);
   Serial.printf("Reading file: %s\n", path);
 
   File file = fs.open(path);
   if(!file){
     Serial.println("Failed to open file for reading");
+    digitalWrite(4, LOW);
     return "0";
   }
 
   Serial.print("Read from file: ");
   while(file.available()){
-    return String(file.read());
+    String result=String(file.read());
+    file.close();
+    digitalWrite(4, LOW);
+
+    return result;
   }
-  file.close();
+  
+
 }
 
 void writeFile(fs::FS &fs, const char * path, const char * message){
+  digitalWrite(4, HIGH);
   Serial.printf("Writing file: %s\n", path);
 
   File file = fs.open(path, FILE_WRITE);
@@ -46,11 +57,12 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
     Serial.println("Write failed");
   }
   file.close();
+    digitalWrite(4, LOW);
 }
 void iniSD(void){
-  if(!SD.begin(4)){
+  digitalWrite(4, HIGH);
+  while(!SD.begin(4)){
     Serial.println("Card Mount Failed");
-    return;
   }
   uint8_t cardType = SD.cardType();
 
@@ -69,4 +81,5 @@ void iniSD(void){
   } else {
     Serial.println("UNKNOWN");
   }
+  digitalWrite(4, LOW);
 }

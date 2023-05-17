@@ -13,14 +13,12 @@ void ini_Adc(void){
   pinMode(SPI_CS, OUTPUT);
 
   // set initial PIN state
-  digitalWrite(SPI_CS, HIGH);
 
-  // initialize serial
-  
 
-  // initialize SPI interface for MCP3208
+
 }
 float read_Adc (int channel, SPISettings settings){
+  digitalWrite(SPI_CS, HIGH);
   uint32_t t1;
   uint32_t t2;
   SPI.beginTransaction(settings);
@@ -67,5 +65,6 @@ float read_Adc (int channel, SPISettings settings){
   // get analog value
   uint16_t val = adc.toAnalog(raw);
   SPI.endTransaction();
+  digitalWrite(SPI_CS, LOW);
   return val;
 }

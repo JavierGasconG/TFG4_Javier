@@ -31,15 +31,21 @@ float grados=0.0;
 
 int zero = 2048;
 int julio_total=41472;
-int julio_actual=41472;
+float julio_actual=41472;
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
 
+void ini_bat(){
+    julio_actual= readFile(SD,"/bat.txt").toFloat();
 
-float bat(double amperaje){
+}
+float bat_calc(double amperaje){
   julio_actual =julio_actual-amperaje*4.8;
+  String jul_aux= String(julio_actual);
+
+  writeFile(SD, "/bat.txt", jul_aux.c_str());
   float porcentaje = julio_actual*100/julio_total;
   return porcentaje;
 }
@@ -60,60 +66,67 @@ void setup(void) {
   while (!Serial)
     delay(10); 
   SPI.begin();
-  digitalWrite(4, HIGH);     //end transfer
-  //ini_amper();
+  pinMode(4, OUTPUT);
+     //end transfer
+  ini_amper();
   ini_Adc();
-  //grados =ini_Giro();
-  //ini_lcd();
-  //ini_Lum();
-  //iniSD();
-  //begin_WiFi();
-  //timeClient.begin();
+  grados =ini_Giro();
+  ini_lcd();
+  ini_Lum();
+  iniSD();
+  begin_WiFi();
+  timeClient.begin();
 }
 
 void loop() {
   //check_version();
-  //double amper=0.0;
-  //float amperaje=0.0;
+  double amper=0.0;
   float viento = 0.0;
-  //float lum = 0.0;
+  float lum = 0.0;
+  float bat =0.0;
 
-  //int i =0;
 
-  //while (i<2)
-  //{
-  //  grados = read_Giro(grados);
-  //  i++;
-  //  write_lcd((double)grados, "Grados: ","", 0,2 );
 
-  //}
+
+  grados = read_Giro(grados);
+
+
+  Serial.println("grados");
+  Serial.println(grados);
+
 
 
   viento = read_viento(1, settings );
+  Serial.println("viento");
+  Serial.println(viento);
+
+  lum = read_lum();
+  voltaje=read_volt(0, settings);
+  Serial.println("lum");
+  Serial.println(lum);
+    Serial.println("voltaje");
+    Serial.println(voltaje);
+
+
+
   
-  //lum = read_lum();
-  //voltaje=read_volt(0, settings);
+  amper=ISNS20_get_mA(settings);
+    Serial.println("amper");
+    Serial.println(amper);
 
-  Serial.print(viento);
-  Serial.println(" kmh");
-  //pinMode(4, OUTPUT);
-  //amper=ISNS20_get_mA(settings);
-  //Serial.print(amper);
-  //Serial.println(" A");
-  delay(500);
-  //amperaje=read_Amper(2);
+  bat=bat_calc(amper);
+    Serial.println("bat");
+    Serial.println(bat);
 
-  //write_lcd((double)voltaje,"Voltaje: ","V", 1,2 );
-  //write_lcd((double)viento,"Viento: ","kmh", 2,2 );
-  //write_lcd((double)lum,"Luminosidad: ","", 3,2 );
+  write_lcd((double)voltaje,"Voltaje: ","V", 1,2 );
+  write_lcd((double)viento,"Viento: ","kmh", 2,2 );
+  write_lcd((double)lum,"Luminosidad: ","", 3,2 );
 
-  //String giroAux= String(grados);
 
-  //writeFile(SD, "/giro.txt", giroAux.c_str());
 
-  //appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+"/n"", Voltaje, "+String(voltaje)+", Amperaje, "+String(amperaje)+", viento, "+String(viento)+", Grados, "+String(grados)).c_str());
-  //Serial.println(timeClient.getDay()+timeClient.getFormattedTime());
+  appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+", "+String(voltaje)+", "+String(amper)+", "+String(viento)+", "+String(grados)+", "+String(lum)+", "+String(bat)+"/n").c_str());
 
+  delay(10000);
 
 
 }

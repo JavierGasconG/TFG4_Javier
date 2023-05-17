@@ -26,8 +26,7 @@
 
 #include <SPI.h> // call library
 #include <Arduino.h>
-#define CS 4 //chip select pin
-#define RELAY 2 //solid state relay
+#define CS 2 //chip select pin
 #define FILTER true //enable/disable digital filter
 #define AVG_NUM 100 //number of readings to average (if filter is on)
 
@@ -63,6 +62,7 @@ double ISNS20_get_mA( SPISettings settings) {
   }
   sum /= AVG_NUM; //divide sum to get the average
   SPI.endTransaction();
+  
   return sum;
 }
 void ini_amper() {

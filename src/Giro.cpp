@@ -5,10 +5,10 @@
 Adafruit_LSM6DSOX sox;
 
 float ini_Giro(void){
-  if (!sox.begin_I2C(0x6B)) {
-    while (1) {
-      delay(10);
-    }
+  while (!sox.begin_I2C(0x6B)) {
+    
+    delay(10);
+    Serial.println("error giro");
   }
   return readFile(SD,"/giro.txt").toFloat();
 }
@@ -25,13 +25,16 @@ float read_Giro( float grados){
     gradosRecogidos = (gyro.gyro.z + 0.02) * 57.2958;
     if(gradosRecogidos > 0.30 || gradosRecogidos < 0.1 ){
       grados= grados - (((gyro.gyro.z + 0.02) * 57.2958)/10);
+      grados = grados-int(int(grados)/360)*360;
 
-      
     }
     
     delay(100);
     i++;
   }
+  String giroAux= String(grados);
+
+  writeFile(SD, "/giro.txt", giroAux.c_str());
   return grados;
 
 }

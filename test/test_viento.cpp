@@ -38,11 +38,7 @@ NTPClient timeClient(ntpUDP);
 
 
 
-float bat(double amperaje){
-  julio_actual =julio_actual-amperaje*4.8;
-  float porcentaje = julio_actual*100/julio_total;
-  return porcentaje;
-}
+
 void begin_WiFi(){
   WiFi.begin(ssid, password);
 
