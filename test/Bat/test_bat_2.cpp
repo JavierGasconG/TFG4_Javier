@@ -77,54 +77,15 @@ void setup(void) {
 }
 
 void loop() {
-  //check_version();
-  double amper=0.0;
-  float viento = 0.0;
-  float lum = 0.0;
-  float bat =0.0;
+  double result =0.0;
 
 
-
-
-  grados = read_Giro(grados);
-
-
-  Serial.println("grados");
-  Serial.println(grados);
-
-
-
-  viento = read_viento(1, settings );
-  Serial.println("viento");
-  Serial.println(viento);
-
-  lum = read_lum();
-  voltaje=read_volt(0, settings);
-  Serial.println("lum");
-  Serial.println(lum);
-    Serial.println("voltaje");
-    Serial.println(voltaje);
-
-
-
-  
-  amper=ISNS20_get_mA(settings);
-    Serial.println("amper");
-    Serial.println(amper);
-
-  bat=bat_calc(amper);
-    Serial.println("bat");
-    Serial.println(bat);
-
-  write_lcd((double)voltaje,"Voltaje: ","V", 1,2 );
-  write_lcd((double)viento,"Viento: ","kmh", 2,2 );
-  write_lcd((double)lum,"Luminosidad: ","", 3,2 );
-
-
-
-  appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+", "+String(voltaje)+", "+String(amper)+", "+String(viento)+", "+String(grados)+", "+String(lum)+", "+String(bat)+"/n").c_str());
-
-  delay(10000);
-
+  result=bat_calc(50);
+  Serial.println(result);
+  result=bat_calc(0);
+  Serial.println(result);
+  result=bat_calc(-50);
+  Serial.println(result);
+  delay(1000);
 
 }

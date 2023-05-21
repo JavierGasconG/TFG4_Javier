@@ -8,7 +8,7 @@ void check_version(void){
       HTTPClient http;
       String serverPath = serverName + "version";
       http.begin(serverPath.c_str());
-            int httpResponseCode = http.GET();
+      int httpResponseCode = http.GET();
       
       if (httpResponseCode>0) {
         Serial.print("HTTP Response code: ");

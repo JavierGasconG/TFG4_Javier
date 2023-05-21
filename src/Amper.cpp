@@ -1,28 +1,4 @@
-/************************************************************************
 
-  Test of Pmod ISNS20 & Pmod SSR
-
-*************************************************************************
-
-  Description: Pmod_ISNS20, Pmod_SSR
-  The current through a load will be measured
-
-  Material
-  1. Arduino Uno
-  2. Pmod ISNS20
-  3. Pmod SSR
-
-  Wiring
-  ISNS20 <----------> Arduino <----------> SSR
-  -         to        5V          to        V
-  VCC       to        3V3         to        -
-  GND       to        GND         to        G
-  CS        to        10          to        -
-  DO        to        12(MISO)    to        -
-  CLK       to        13(SCK)     to        -
-  -         to        2           to        ON
-
-************************************************************************/
 
 #include <SPI.h> // call library
 #include <Arduino.h>
@@ -75,5 +51,3 @@ void ini_amper() {
 
 }
 
-
-//measure with the sensor (send true as parameter to measure the offset)
