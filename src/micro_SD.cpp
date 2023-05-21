@@ -51,7 +51,7 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
     Serial.println("Failed to open file for writing");
     return;
   }
-  if(file.print(message)){
+  if(file.println(message)){
     Serial.println("File written");
   } else {
     Serial.println("Write failed");
