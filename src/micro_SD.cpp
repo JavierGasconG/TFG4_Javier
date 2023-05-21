@@ -11,7 +11,7 @@ void appendFile(fs::FS &fs, const char * path, const char * message){
         digitalWrite(4, LOW);
         return;
     }
-    if(file.print(message)){
+    if(file.println(message)){
         Serial.println("Message appended");
     } else {
         Serial.println("Append failed");
