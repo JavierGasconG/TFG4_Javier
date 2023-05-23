@@ -77,7 +77,7 @@ void setup(void) {
 }
 
 void loop() {
-  //check_version();
+  check_version();
   double amper=0.0;
   float viento = 0.0;
   float lum = 0.0;
@@ -122,7 +122,7 @@ void loop() {
 
 
 
-  appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+", "+String(voltaje)+", "+String(amper)+", "+String(viento)+", "+String(grados)+", "+String(lum)+", "+String(bat)+"/n").c_str());
+  appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+", "+String(voltaje)+", "+String(amper)+", "+String(viento)+", "+String(grados)+", "+String(lum)+", "+String(bat)+";/n").c_str());
 
   delay(10000);
 
