@@ -77,10 +77,10 @@ void setup(void) {
 }
 
 void loop() {
-  float adc =0.0;
+  float result =0.0;
 
-  adc=read_Adc(0,settings);
-  Serial.println(adc);
+  result=read_viento(0,settings);
+  Serial.println(result);
   delay(1000);
 
 
