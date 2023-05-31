@@ -31,15 +31,16 @@ String readFile(fs::FS &fs, const char * path){
   }
 
   Serial.print("Read from file: ");
+  String result="";
   while(file.available()){
-    String result=String(file.read());
+    result=result+String((char)file.read());
+
+  }
+  
     file.close();
     digitalWrite(4, LOW);
 
     return result;
-  }
-  
-
 }
 
 void writeFile(fs::FS &fs, const char * path, const char * message){

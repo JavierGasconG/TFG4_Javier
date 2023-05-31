@@ -23,14 +23,14 @@ void setup(void) {
   SPI.begin();
   
   iniSD();
-
+  writeFile(SD, "/test.txt", "test");
 
 }
 
 void loop() {
-  String result=""
-  appendFile(SD, "/test.txt",("test")c.str);
-  writeFile(SD, "/test2.txt",("test2")c.str);
+  String result="";
+  appendFile(SD, "/test.txt", "test");
+  writeFile(SD, "/test2.txt", "test2");
   result =readFile(SD, "/test.txt");
   Serial.println(result);
   result=readFile(SD, "/test1.txt");

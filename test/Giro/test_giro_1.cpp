@@ -23,6 +23,7 @@ void setup(void) {
   while (!Serial)
     delay(10); 
   SPI.begin();
+  iniSD();
   
   grados =ini_Giro();
 
