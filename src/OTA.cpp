@@ -6,6 +6,7 @@ String version = "";
 void check_version(void){
   if(WiFi.status()== WL_CONNECTED){
       HTTPClient http;
+      Serial.println("Wifi conected");
       String serverPath = serverName + "version";
       http.begin(serverPath.c_str());
       int httpResponseCode = http.GET();
@@ -13,6 +14,7 @@ void check_version(void){
       if (httpResponseCode>0) {
         Serial.print("HTTP Response code: ");
         String payload = http.getString();
+        Serial.println("server conected");
 
         Serial.print("version: ");
         Serial.println(payload);
