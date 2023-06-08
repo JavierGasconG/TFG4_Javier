@@ -14,6 +14,8 @@ float read_lum(void){
   float lux =0.0;
   if (lightMeter.measurementReady()) {
     float lux = lightMeter.readLightLevel();
+
+    return lux;
   }
   return lux;
 }

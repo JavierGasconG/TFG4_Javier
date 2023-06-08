@@ -29,7 +29,7 @@ float grados=0.0;
 
 int zero = 2048;
 int julio_total=41472;
-float julio_actual=41472;
+float julio_actual=0;
 
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
@@ -114,7 +114,7 @@ void loop() {
 
   bat=bat_calc(amper);
 
-  write_lcd((double)voltaje,"Bateria: ","%", 0,2 );
+  write_lcd((double)voltaje,"  Bateria: ","%", 0,2 );
 
   write_lcd((double)voltaje,"Voltaje: ","V", 1,2 );
   write_lcd((double)viento,"Viento: ","kmh", 2,2 );
@@ -124,6 +124,21 @@ void loop() {
 
   appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+", "+String(voltaje)+", "+String(amper)+", "+String(viento)+", "+String(grados)+", "+String(lum)+", "+String(bat)).c_str());
   delay(200);
+  Serial.println("voltaje");
+  Serial.println(voltaje);
+    
+  Serial.println("amper");
 
+  Serial.println(amper);
+  Serial.println("viento");
 
+  Serial.println(viento);
+
+  Serial.println("lum");
+  Serial.println(lum);
+  Serial.println("bat");
+  Serial.println(bat);
+
+  Serial.println(timeClient.getFormattedTime());
+  //Serial.println(bat);
 }
