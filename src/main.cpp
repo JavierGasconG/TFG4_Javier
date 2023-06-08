@@ -74,10 +74,15 @@ void setup(void) {
   iniSD();
   begin_WiFi();
   timeClient.begin();
+  timeClient.forceUpdate();
+
 }
 
 void loop() {
-  check_version();
+  if(timeClient.getHours()==0 & timeClient.getMinutes()==0){
+    check_version();
+    timeClient.forceUpdate();
+  }
   double amper=0.0;
   float viento = 0.0;
   float lum = 0.0;
@@ -91,30 +96,25 @@ void loop() {
 
   Serial.println("grados");
   Serial.println(grados);
-
+  Serial.println(timeClient.getSeconds());
 
 
   viento = read_viento(1, settings );
-  Serial.println("viento");
-  Serial.println(viento);
+
 
   lum = read_lum();
   voltaje=read_volt(0, settings);
-  Serial.println("lum");
-  Serial.println(lum);
-    Serial.println("voltaje");
-    Serial.println(voltaje);
+
 
 
 
   
   amper=ISNS20_get_mA(settings);
-    Serial.println("amper");
-    Serial.println(amper);
+
 
   bat=bat_calc(amper);
-    Serial.println("bat");
-    Serial.println(bat);
+
+  write_lcd((double)voltaje,"Bateria: ","%", 0,2 );
 
   write_lcd((double)voltaje,"Voltaje: ","V", 1,2 );
   write_lcd((double)viento,"Viento: ","kmh", 2,2 );
@@ -123,8 +123,7 @@ void loop() {
 
 
   appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+", "+String(voltaje)+", "+String(amper)+", "+String(viento)+", "+String(grados)+", "+String(lum)+", "+String(bat)).c_str());
-
-  delay(10000);
+  delay(200);
 
 
 }
