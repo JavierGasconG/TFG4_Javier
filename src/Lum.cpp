@@ -14,9 +14,7 @@ float read_lum(void){
   float lux =0.0;
   if (lightMeter.measurementReady()) {
     float lux = lightMeter.readLightLevel();
-    Serial.print("Light: ");
-    Serial.print(lux);
-    Serial.println(" lx");
+
     return lux;
   }
   return lux;

@@ -14,6 +14,7 @@
 #include "Amper.h"
 #include "Volt.h"
 
+
 double voltaje=0.0;
 
 SPISettings settings(1000000, MSBFIRST, SPI_MODE0);
@@ -76,15 +77,9 @@ void setup(void) {
   timeClient.begin();
 }
 
-void loop() {
-  String result="";
-  appendFile(SD, "/test.txt", "test");
-  writeFile(SD, "/test2.txt", "test2");
-  result =readFile(SD, "/test.txt");
-  Serial.println(result);
-  result=readFile(SD, "/test1.txt");
-  Serial.println(result);
 
-  delay(1000);
+void loop() {
+
+  Serial.println(timeClient.getDay()+", "+timeClient.getFormattedTime());
 
 }

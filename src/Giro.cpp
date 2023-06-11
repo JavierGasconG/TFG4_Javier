@@ -23,11 +23,12 @@ float read_Giro( float grados){
   {
     sox.getEvent(&accel, &gyro, &temp);
     gradosRecogidos = (gyro.gyro.z + 0.02) * 57.2958;
-    if(gradosRecogidos > 0.30 || gradosRecogidos < 0.1 ){
+    if(gradosRecogidos > 0.10 || gradosRecogidos < -0.1 ){
       grados= grados - (((gyro.gyro.z + 0.02) * 57.2958)/10);
-      grados = grados-int(int(grados)/360)*360;
+    
 
     }
+
     
     delay(100);
     i++;

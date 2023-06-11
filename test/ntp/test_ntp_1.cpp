@@ -36,18 +36,7 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
 
-void ini_bat(){
-    julio_actual= readFile(SD,"/bat.txt").toFloat();
 
-}
-float bat_calc(double amperaje){
-  julio_actual =julio_actual-amperaje*4.8;
-  String jul_aux= String(julio_actual);
-
-  writeFile(SD, "/bat.txt", jul_aux.c_str());
-  float porcentaje = julio_actual*100/julio_total;
-  return porcentaje;
-}
 void begin_WiFi(){
   WiFi.begin(ssid, password);
 
@@ -64,15 +53,7 @@ void setup(void) {
   Serial.begin(9600);
   while (!Serial)
     delay(10); 
-  SPI.begin();
-  pinMode(4, OUTPUT);
-     //end transfer
-  ini_amper();
-  ini_Adc();
-  grados =ini_Giro();
-  ini_lcd();
-  ini_Lum();
-  iniSD();
+ 
   begin_WiFi();
   timeClient.begin();
 }
@@ -80,6 +61,6 @@ void setup(void) {
 
 void loop() {
 
-  Serial.println(timeClient.getDay()+","+timeClient.getHours","+ timeClient.getMinutes()","+ timeClient.getSeconds())
+  Serial.println(timeClient.getDay()+", "+timeClient.getFormattedTime());
 
 }

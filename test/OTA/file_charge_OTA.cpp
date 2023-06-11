@@ -16,27 +16,37 @@
 
 
 
+const char* ssid       = "SBC";
+const char* password   = "SBCwifi$";
+
+
+
+
+void begin_WiFi(){
+  WiFi.begin(ssid, password);
+
+  while ( WiFi.status() != WL_CONNECTED ) {
+    delay ( 500 );
+    Serial.println ( "wifi" );
+  }
+
+}
+
+
+
 void setup(void) {
   Serial.begin(9600);
   while (!Serial)
     delay(10); 
-  SPI.begin();
-  
-  iniSD();
-  writeFile(SD, "/test.txt", "test");
+
+  begin_WiFi();
 
 }
 
+
 void loop() {
-  String result="";
-  appendFile(SD, "/test.txt", "test");
-  writeFile(SD, "/test2.txt", "test2");
-  result =readFile(SD, "/test.txt");
-  Serial.println(result);
-  result=readFile(SD, "/test1.txt");
-  Serial.println(result);
 
+  Serial.println("update_ok");
   delay(1000);
-
 
 }

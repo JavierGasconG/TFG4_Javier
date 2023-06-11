@@ -7,7 +7,7 @@ double read_volt(int channer,  SPISettings settings){
     sum+=read_Adc(0,settings);
   }
   sum/=AVG_NUM;
-  sum=sum/1000*5.46;
+  sum=sum/1000*5.567;
   return sum;
 
 }
