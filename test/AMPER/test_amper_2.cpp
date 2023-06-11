@@ -79,7 +79,7 @@ void setup(void) {
 void loop() {
   double result =0.0;
 
-  result=ISNS20_get_mA(settings);
+  result=get_mA(settings);
   Serial.println(result);
   delay(1000);
 

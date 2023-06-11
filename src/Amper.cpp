@@ -1,14 +1,13 @@
 
 
-#include <SPI.h> // call library
+#include <SPI.h> 
 #include <Arduino.h>
 #define CS 2 //chip select pin
-#define FILTER true //enable/disable digital filter
-#define AVG_NUM 100 //number of readings to average (if filter is on)
+#define AVG_NUM 100 //number of readings to average 
 
 double offset = -1.499; //variable to save measurement offset
 
-double ISNS20_get_mA( SPISettings settings) {
+double get_mA( SPISettings settings) {
   SPI.beginTransaction(settings);
 
   double sum = 0;
@@ -16,10 +15,10 @@ double ISNS20_get_mA( SPISettings settings) {
     int temporal = 0;
     digitalWrite(CS, LOW);      //begin SPI transfer
     delay(1);
-    temporal = SPI.transfer(0x00);   //transfer first byte in
-    temporal <<= 8; //shift msb to place
+    temporal = SPI.transfer(0x00);   
+    temporal <<= 8; 
     delay(1);
-    temporal |= SPI.transfer(0x00);   //transfer and append second byte in
+    temporal |= SPI.transfer(0x00);   
     delay(1);
     digitalWrite(CS, HIGH);     //end transfer
     delay(1);
@@ -29,14 +28,11 @@ double ISNS20_get_mA( SPISettings settings) {
   
     result = (result - offset) / 0.066; //correct offset: (result-offset)/(0.066V per Amp ratio)
     
-    //if no filtering is needed, return the result
-    if (!FILTER) {
-      return result;
-    }
+ 
 
-    sum += result;  //add partial results for averaging
+    sum += result;  
   }
-  sum /= AVG_NUM; //divide sum to get the average
+  sum /= AVG_NUM; 
   SPI.endTransaction();
   
   return sum;

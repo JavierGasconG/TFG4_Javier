@@ -63,24 +63,8 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
 void iniSD(void){
   digitalWrite(4, LOW);
   while(!SD.begin(4)){
-    //Serial.println("Card Mount Failed");
-  }
-  uint8_t cardType = SD.cardType();
-
-  if(cardType == CARD_NONE){
-    //Serial.println("No SD card attached");
-    return;
+    Serial.println("Card Mount Failed");
   }
 
-  //Serial.print("SD Card Type: ");
-  if(cardType == CARD_MMC){
-    //Serial.println("MMC");
-  } else if(cardType == CARD_SD){
-    //Serial.println("SDSC");
-  } else if(cardType == CARD_SDHC){
-    //Serial.println("SDHC");
-  } else {
-    //Serial.println("UNKNOWN");
-  }
   digitalWrite(4, HIGH);
 }

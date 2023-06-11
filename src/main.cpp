@@ -109,7 +109,7 @@ void loop() {
 
 
   
-  amper=ISNS20_get_mA(settings);
+  amper=get_mA(settings);
 
 
   bat=bat_calc(amper);
@@ -123,7 +123,6 @@ void loop() {
 
 
   appendFile(SD, "/data.txt",(timeClient.getDay()+timeClient.getFormattedTime()+", "+String(voltaje)+", "+String(amper)+", "+String(viento)+", "+String(grados)+", "+String(lum)+", "+String(bat)).c_str());
-  delay(200);
   Serial.println("voltaje");
   Serial.println(voltaje);
     
