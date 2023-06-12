@@ -60,7 +60,7 @@ void setup(void) {
 
 
 void loop() {
-
+  timeClient.forceUpdate();
   Serial.println(timeClient.getDay()+", "+timeClient.getFormattedTime());
 
 }
