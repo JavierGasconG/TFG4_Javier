@@ -28,11 +28,11 @@ void setup(void) {
 }
 
 void loop() {
-  write_lcd((double)1.0,"test: ","0", 0,2 );
+  write_lcd((double)0.0,"test: ","0", 0,2 );
 
   write_lcd((double)1.0,"test: ","1", 1,2 );
   write_lcd((double)2.0,"test: ","2", 2,2 );
-  write_lcd((double)3.0,"testt: ","3", 3,2 );
+  write_lcd((double)3.0,"test: ","3", 3,2 );
   delay(1000);
 
 

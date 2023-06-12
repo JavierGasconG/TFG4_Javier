@@ -77,10 +77,9 @@ void setup(void) {
 }
 
 void loop() {
-  float result =0.0;
-  result=read_Giro(grados);
-  Serial.println(result);
-  delay(1000);
+  grados=read_Giro(grados);
+  Serial.println(grados);
+  delay(100);
 
 
 

@@ -40,7 +40,7 @@ void ini_bat(){
 
 }
 float bat_calc(double amperaje){
-  julio_actual =julio_actual-amperaje*4.8;
+  julio_actual =julio_actual-amperaje*5.2;
   String jul_aux= String(julio_actual);
 
   writeFile(SD, "/bat.txt", jul_aux.c_str());

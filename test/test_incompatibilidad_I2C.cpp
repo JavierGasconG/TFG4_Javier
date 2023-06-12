@@ -24,6 +24,8 @@ void setup(void) {
     delay(10); 
   SPI.begin();
   iniSD();
+  ini_Lum();
+  ini_lcd();
   
   grados =ini_Giro();
 
@@ -32,11 +34,18 @@ void setup(void) {
 
 void loop() {
 
+  float result =0.0;
 
+
+  result=read_lum();
+  Serial.println(result);
 
   grados=read_Giro(grados);
   Serial.println(grados);
-  delay(100);
+  write_lcd((double)0.0,"test: ","0", 0,2 );
 
+  write_lcd((double)1.0,"test: ","1", 1,2 );
+  write_lcd((double)2.0,"test: ","2", 2,2 );
+  write_lcd((double)3.0,"test: ","3", 3,2 );
 
 }

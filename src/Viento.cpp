@@ -5,7 +5,7 @@ float read_viento(int channel, SPISettings settings){
   viento= read_Adc(channel, settings);
   if(viento>520){
     viento=viento/2000.0*32;
-    viento= viento*1.61;
+    viento= viento*3.6;
   }else{
     viento =0.0;
   }
