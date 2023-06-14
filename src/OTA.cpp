@@ -2,7 +2,7 @@
 #include <HTTPClient.h>
 #include <ESP32httpUpdate.h>
 String serverName = "http://192.168.1.205/"; 
-String version = "";
+float version = 0.1;
 void check_version(void){
   if(WiFi.status()== WL_CONNECTED){
       HTTPClient http;
@@ -17,7 +17,8 @@ void check_version(void){
 
         Serial.print("version: ");
         Serial.println(payload);
-        if(version != payload){
+        if(version != payload.toFloat()){
+
           t_httpUpdate_return ret = ESPhttpUpdate.update("http://192.168.1.205/firmware.bin");       
         }
       }
